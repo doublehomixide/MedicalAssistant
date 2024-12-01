@@ -1,6 +1,7 @@
+from datetime import datetime
 import sqlalchemy.exc
 from fastapi import Depends, HTTPException
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 import re
@@ -17,7 +18,7 @@ class UserCRUD:
     def __init__(self, db_session: AsyncSession = None):
         self.db_session = db_session
 
-    async def create_user(self, user: schemas.UserRegistration) -> UserRegistration:
+    async def create_user(self, user: schemas.UserRegistration) -> schemas.UserRegistration:
         db_model = models.UserModel(
             username=user.username,
             displayed_name=user.displayed_name,
@@ -52,3 +53,17 @@ class UserCRUD:
         statement.execution_options(synchronize_session="fetch")
         await self.db_session.execute(statement)
         return {'status': 'Данные успешно обновлены'}
+
+    async def update_user_login(self, username: str):
+        db_user = await self.read_user_by_username(username)
+        db_user.last_login = datetime.utcnow()
+        await self.db_session.refresh(db_user)
+        return db_user
+
+    async def delete_user(self, user: UserRegistration):
+        username = user.username
+        statement = delete(UserModel).where(UserModel.username == username)
+        statement.execution_options(synchronize_session='fetch')
+        await self.db_session.execute(statement)
+        return {"status":"success",
+                username:"deleted"}

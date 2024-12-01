@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException
-import jwt
+from jose import jwt
 from typing import Annotated
 
 from backend.database.database_config import async_session
@@ -18,7 +18,7 @@ async def validate_user(username: str, password: str):
             if not user:
                 return False
 
-            if not verify_password(password, user.password):
+            if not verify_password(password, user.hashed_password):
                 return False
             return user
 
@@ -32,7 +32,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     try:
         payload = jwt.decode(
             token,
-            settings.access_token_secret,
+            settings.SECRET_KEY,
             algorithms=["HS256"],
         )
         username: str = payload.get("username")

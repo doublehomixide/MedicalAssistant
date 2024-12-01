@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Extra
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 
@@ -10,6 +10,9 @@ class User(BaseModel):
     displayed_name: str
     email: str
     telephone_number: str
+
+    class Config:
+        extra = Extra.ignore
 
 
 class UserRegistration(User):
@@ -20,9 +23,12 @@ class Doctor(BaseModel):
     username: str
     displayed_name: str
     email: str
-    telephone_number: PhoneNumber
+    telephone_number: str
     specialization: str
     photo: str
+
+    class Config:
+        extra = Extra.ignore
 
 
 class DoctorRegistration(Doctor):

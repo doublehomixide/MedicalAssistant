@@ -1,11 +1,13 @@
 from fastapi import FastAPI
-from backend.api import user
+from backend.api import user,auth,appointments,doctor
 from fastapi.middleware.cors import CORSMiddleware
-from backend.database.database_config  import engine, database, Base
-
+from backend.database.database_config import engine, database, Base
 
 app = FastAPI()
 app.include_router(user.router, prefix='/app')
+app.include_router(auth.router, prefix='/app')
+app.include_router(appointments.router, prefix='/app')
+app.include_router(doctor.router, prefix='/app')
 origins = [
     "http://localhost:5173",
 ]
@@ -37,3 +39,4 @@ async def startup():
 async def shutdown():
     if database.is_connected:
         await database.disconnect()
+#
