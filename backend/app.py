@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from backend.api import user,auth,appointments,doctor
+from backend.api import user,user_auth,appointments,doctor
 from fastapi.middleware.cors import CORSMiddleware
 from backend.database.database_config import engine, database, Base
 

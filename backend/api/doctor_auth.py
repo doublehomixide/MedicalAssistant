@@ -15,7 +15,7 @@ from backend.authentication.action.user import validate_user
 from backend.authentication.utilities import create_access_token, create_refresh_token
 from config import get_settings
 
-router = APIRouter(prefix='/authentication',tags=['Аутенфикация'])
+router = APIRouter(prefix='/user_authentication',tags=['Аутенфикация пользователей'])
 settings = get_settings()
 
 

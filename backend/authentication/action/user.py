@@ -9,7 +9,6 @@ from config import get_settings
 
 settings = get_settings()
 
-
 async def validate_user(username: str, password: str):
     async with async_session() as session:
         async with session.begin():

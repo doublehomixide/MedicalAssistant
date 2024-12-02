@@ -1,4 +1,5 @@
 import re
+from typing import List
 
 import sqlalchemy
 from fastapi import HTTPException
@@ -42,8 +43,14 @@ class DoctorCRUD:
                     detail=f"{clear_error_message[0]} {clear_error_message[1]} already exist"
                 )
 
-    async def read_doctors(self):
-        statement = select(DoctorRegistration)
+    async def read_doctors(self) -> List[DoctorModel]:
+        statement = select(DoctorModel)
+        request = await self.db_session.execute(statement)
+        result = request.scalars().all()
+        return result
+
+    async def read_doctor_by_user_name(self, username: str):
+        statement = select(DoctorModel).where(DoctorModel.username == username)
         request = await self.db_session.execute(statement)
         result = request.scalars().first()
         return result
