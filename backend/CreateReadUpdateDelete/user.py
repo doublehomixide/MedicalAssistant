@@ -28,7 +28,6 @@ class UserCRUD:
         )
         try:
             self.db_session.add(db_model)
-            await self.db_session.commit()
             return db_model
         except sqlalchemy.exc.IntegrityError as error:
             error_message = str(error.orig)
