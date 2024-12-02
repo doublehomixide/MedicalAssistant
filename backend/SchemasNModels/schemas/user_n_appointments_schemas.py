@@ -16,7 +16,7 @@ class User(BaseModel):
 
 
 class UserRegistration(User):
-    password: str
+    hashed_password: str
 
 
 class Doctor(BaseModel):
@@ -32,7 +32,7 @@ class Doctor(BaseModel):
 
 
 class DoctorRegistration(Doctor):
-    password: str
+    hashed_password: str
 
 
 ############

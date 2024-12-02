@@ -7,15 +7,14 @@ from jose import jwt
 from starlette import status
 
 from backend.CreateReadUpdateDelete.depends import get_user_crud
-from backend.CreateReadUpdateDelete.user import UserCRUD
+from backend.CreateReadUpdateDelete.object_crud import UserCRUD
 from backend.SchemasNModels.schemas import user_n_appointments_schemas as schemas
 from backend.SchemasNModels.schemas.token import Token
-from backend.SchemasNModels.schemas.user_n_appointments_schemas import UserRegistration
-from backend.authentication.action.user import validate_user
+from backend.authentication.action.object_auth_methods import UserAuthMethods
 from backend.authentication.utilities import create_access_token, create_refresh_token
 from config import get_settings
 
-router = APIRouter(prefix='/user_authentication',tags=['Аутенфикация пользователей'])
+router = APIRouter(prefix='/user_authentication', tags=['Аутенфикация пациентов'])
 settings = get_settings()
 
 
@@ -24,7 +23,7 @@ async def register_new_user(
         user: Annotated[schemas.UserRegistration, Depends()],
         db: UserCRUD = Depends(get_user_crud)
 ):
-    return await db.create_user(user)
+    return await db.create_object(user)
 
 
 @router.post("/logout")
@@ -39,7 +38,7 @@ async def login(
         form_data: OAuth2PasswordRequestForm = Depends(),
         db: UserCRUD = Depends(get_user_crud),
 ):
-    user = await validate_user(form_data.username, form_data.password)
+    user = await UserAuthMethods.validate_object(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -50,7 +49,7 @@ async def login(
     access_token = await create_access_token(data={"username": form_data.username})
     refresh_token = await create_refresh_token(data={"username": form_data.username})
 
-    await db.update_user_login(username=form_data.username)
+    await db.update_object_login(username=form_data.username)
     expired_time = (
             int(datetime.now(tz=timezone.utc).timestamp() * 1000)
             + timedelta(minutes=settings.ACCESS_TOKEN_TIME).seconds * 1000
@@ -105,7 +104,7 @@ async def refresh(
     access_token = await create_access_token(data={"sub": username})
     refresh_token = await create_refresh_token(data={"sub": username})
 
-    db.update_user_login(username=username)
+    await db.update_object_login(username=username)
     expired_time = (
             int(datetime.now(tz=timezone.utc).timestamp() * 1000)
             + timedelta(minutes=settings.access_token_expire_minutes).seconds * 1000
