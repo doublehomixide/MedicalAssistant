@@ -28,7 +28,7 @@ async def get_appointment_crud() -> Generator:
 
 class PermissionChecker:
 
-    def __init__(self, required_role: list[str]) -> None:
+    def __init__(self, required_role: str) -> None:
         self.required_role = required_role
 
     def __call__(self, user: UserInDB = Depends(get_current_user)) -> bool:
