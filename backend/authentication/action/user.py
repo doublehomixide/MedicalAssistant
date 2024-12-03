@@ -1,13 +1,15 @@
-from fastapi import Depends, HTTPException
-from jose import jwt
 from typing import Annotated
 
-from backend.database.database_config import async_session
+from fastapi import Depends, HTTPException
+from jose import jwt
+
 from backend.CreateReadUpdateDelete.user import UserCRUD
 from backend.authentication.utilities import verify_password, oauth2_scheme
+from backend.database.database_config import async_session
 from config import get_settings
 
 settings = get_settings()
+
 
 async def validate_user(username: str, password: str):
     async with async_session() as session:
@@ -17,7 +19,7 @@ async def validate_user(username: str, password: str):
             if not user:
                 return False
 
-            if not verify_password(password, user.hashed_password):
+            if not verify_password(password, user.password):
                 return False
             return user
 

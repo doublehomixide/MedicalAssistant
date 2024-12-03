@@ -1,13 +1,12 @@
 from fastapi import FastAPI
-from backend.api import user,user_auth,appointments,doctor
+from backend.api import account,auth,appointments
 from fastapi.middleware.cors import CORSMiddleware
 from backend.database.database_config import engine, database, Base
 
 app = FastAPI()
-app.include_router(user.router, prefix='/app')
+app.include_router(account.router, prefix='/app')
 app.include_router(auth.router, prefix='/app')
 app.include_router(appointments.router, prefix='/app')
-app.include_router(doctor.router, prefix='/app')
 origins = [
     "http://localhost:5173",
 ]

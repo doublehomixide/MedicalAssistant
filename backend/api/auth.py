@@ -8,23 +8,41 @@ from starlette import status
 
 from backend.CreateReadUpdateDelete.depends import get_user_crud
 from backend.CreateReadUpdateDelete.user import UserCRUD
-from backend.SchemasNModels.schemas import user_n_appointments_schemas as schemas
 from backend.SchemasNModels.schemas.token import Token
-from backend.SchemasNModels.schemas.user_n_appointments_schemas import UserRegistration
+from backend.SchemasNModels.schemas.user_n_appointments_schemas import UserInDB, UserInput
 from backend.authentication.action.user import validate_user
 from backend.authentication.utilities import create_access_token, create_refresh_token
 from config import get_settings
 
-router = APIRouter(prefix='/user_authentication',tags=['Аутенфикация пользователей'])
+router = APIRouter(prefix='/user_authentication', tags=['Аутенфикация пользователей'])
 settings = get_settings()
 
 
-@router.post('/register')
+@router.post('/register_user')
 async def register_new_user(
-        user: Annotated[schemas.UserRegistration, Depends()],
+        user: Annotated[UserInput, Depends()],
         db: UserCRUD = Depends(get_user_crud)
 ):
-    return await db.create_user(user)
+    ready_user = UserInDB(**user.model_dump(), role='user')
+    return await db.create_user(ready_user)
+
+
+@router.post('/register_doctor')
+async def register_new_doctor(
+        user: Annotated[UserInput, Depends()],
+        db: UserCRUD = Depends(get_user_crud)
+):
+    ready_user = UserInDB(**user.model_dump(), role='doctor')
+    return await db.create_user(ready_user)
+
+
+@router.post('/register_admin')
+async def register_new_admin(
+        user: Annotated[UserInput, Depends()],
+        db: UserCRUD = Depends(get_user_crud)
+):
+    ready_user = UserInDB(**user.model_dump(), role='admin')
+    return await db.create_user(ready_user)
 
 
 @router.post("/logout")
@@ -50,7 +68,6 @@ async def login(
     access_token = await create_access_token(data={"username": form_data.username})
     refresh_token = await create_refresh_token(data={"username": form_data.username})
 
-    await db.update_user_login(username=form_data.username)
     expired_time = (
             int(datetime.now(tz=timezone.utc).timestamp() * 1000)
             + timedelta(minutes=settings.ACCESS_TOKEN_TIME).seconds * 1000
@@ -105,7 +122,6 @@ async def refresh(
     access_token = await create_access_token(data={"sub": username})
     refresh_token = await create_refresh_token(data={"sub": username})
 
-    db.update_user_login(username=username)
     expired_time = (
             int(datetime.now(tz=timezone.utc).timestamp() * 1000)
             + timedelta(minutes=settings.access_token_expire_minutes).seconds * 1000

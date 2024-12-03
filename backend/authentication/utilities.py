@@ -6,7 +6,7 @@ from passlib.context import CryptContext
 
 settings = get_settings()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/app/authentication/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/app/user_authentication/login")
 
 
 def verify_password(plain_password, hashed_password):

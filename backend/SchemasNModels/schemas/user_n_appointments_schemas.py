@@ -5,41 +5,23 @@ from pydantic import BaseModel, Extra
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 
-class User(BaseModel):
+class UserInput(BaseModel):
     username: str
-    displayed_name: str
-    email: str
-    telephone_number: str
-
-    class Config:
-        extra = Extra.ignore
-
-
-class UserRegistration(User):
     password: str
-
-
-class Doctor(BaseModel):
-    username: str
-    displayed_name: str
-    email: str
+    full_name: str
     telephone_number: str
-    specialization: str
-    photo: str
-
-    class Config:
-        extra = Extra.ignore
+    email: str
 
 
-class DoctorRegistration(Doctor):
-    password: str
+class UserInDB(UserInput):
+    role: str
 
 
 ############
 
 
 class Appointment(BaseModel):
-    Customer: User
-    Doctor: Doctor
+    Customer: UserInDB
+    Doctor: UserInDB
     time: datetime
     unique_id: str
